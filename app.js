@@ -29,12 +29,16 @@ passport.deserializeUser((user, done) => {
 passport.use(new OIDCStrategy({
   identityMetadata: process.env.IDENTITY_METADATA,
   clientID: process.env.CLIENT_ID,
-  responseType: process.env.RESPONSE_TYPE,
-  responseMode: process.env.RESPONSE_MODE,
+  responseType: process.env.RESPONSE_TYPE, // OAuth 2.0 authorization code flow
+  responseMode: process.env.RESPONSE_MODE, // OAuth 2.0 authorization code flow
   redirectUrl: process.env.REDIRECT_URL,
   clientSecret: process.env.CLIENT_SECRET,
   scope: scope,
 }, (issuer, sub, profile, accessToken, refreshToken, done) => {
+  // Store tokens and authorization code in the session
+  profile.authorizationCode = sub;
+  profile.accessToken = accessToken;
+  profile.refreshToken = refreshToken;
   return done(null, profile);
 }));
 
@@ -57,6 +61,10 @@ app.get('/auth/callback', passport.authenticate('azuread-openidconnect', { failu
       <p>Email: ${req.user._json.email}</p>
       <p>Profile:</p>
       <pre>${JSON.stringify(req.user, null, 2)}</pre>
+      <h2>Authorization Code and Token Exchange</h2>
+      <p>Authorization Code: ${req.user.authorizationCode}</p>
+      <p>Access Token: ${req.user.accessToken}</p>
+      <p>Refresh Token: ${req.user.refreshToken}</p>
       <form action="/logout" method="post">
         <button type="submit">Logout</button>
       </form>
@@ -71,7 +79,7 @@ app.post('/logout', (req, res) => {
     req.session.destroy((err) => {
       res.clearCookie('connect.sid');
       // Redirect to Entra logout endpoint
-      res.redirect(`https://login.microsoftonline.com/common/oauth2/logout?post_logout_redirect_uri=https://localhost:3000/auth`);
+      res.redirect(`https://login.microsoftonline.com/common/oauth2/logout?post_logout_redirect_uri=https://localhost:3000`);
     });
   });
 });
