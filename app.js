@@ -1,15 +1,12 @@
-
 require('dotenv').config();
-
 const express = require('express');
 const https = require('https');
 const fs = require('fs');
 const passport = require('passport');
 const OIDCStrategy = require('passport-azure-ad').OIDCStrategy;
 const session = require('express-session');
+
 const scope = process.env.SCOPE.split(',');
-
-
 const app = express();
 
 // Set up session middleware
@@ -24,11 +21,11 @@ app.use(session({
 passport.serializeUser((user, done) => {
   done(null, user);
 });
-
 passport.deserializeUser((user, done) => {
   done(null, user);
 });
 
+// Use the OIDCStrategy within Passport
 passport.use(new OIDCStrategy({
   identityMetadata: process.env.IDENTITY_METADATA,
   clientID: process.env.CLIENT_ID,
@@ -45,26 +42,39 @@ passport.use(new OIDCStrategy({
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Define routes
 app.get('/auth', passport.authenticate('azuread-openidconnect', { failureRedirect: '/' }), (req, res) => {
   res.redirect('/');
 });
 
-
 app.get('/auth/callback', passport.authenticate('azuread-openidconnect', { failureRedirect: '/' }), (req, res) => {
-    // Render user information with pretty JSON
-    res.send(`
-        <html>
-            <body>
-                <h1>Authentication Successful</h1>
-                <p>Welcome, ${req.user.displayName}!</p>
-                <p>Email: ${req.user._json.email}</p>
-                <p>Profile:</p>
-                <pre>${JSON.stringify(req.user, null, 2)}</pre>
-            </body>
-        </html>
-    `);
+  // Render user information with pretty JSON and a logout button
+  res.send(`
+    <html>
+    <body>
+      <h1>Authentication Successful</h1>
+      <p>Welcome, ${req.user.displayName}!</p>
+      <p>Email: ${req.user._json.email}</p>
+      <p>Profile:</p>
+      <pre>${JSON.stringify(req.user, null, 2)}</pre>
+      <form action="/logout" method="post">
+        <button type="submit">Logout</button>
+      </form>
+    </body>
+    </html>
+  `);
 });
-    
+
+app.post('/logout', (req, res) => {
+  req.logout((err) => {
+    if (err) { return next(err); }
+    req.session.destroy((err) => {
+      res.clearCookie('connect.sid');
+      // Redirect to Entra logout endpoint
+      res.redirect(`https://login.microsoftonline.com/common/oauth2/logout?post_logout_redirect_uri=https://localhost:3000/auth`);
+    });
+  });
+});
 
 const options = {
   key: fs.readFileSync(process.env.CERT_KEY_FILE),
