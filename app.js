@@ -66,7 +66,7 @@ app.use(passport.session());
 
 // Define routes
 
-app.get('/auth', (req, res, next) => {
+app.get('/', (req, res, next) => {
    const appName = req.query.app || 'app1'; // Determine the enterprise app from query parameter
    const config = getEnterpriseAppConfig(appName);
    console.log('Appname param value:', appName);
