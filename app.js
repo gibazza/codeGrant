@@ -51,9 +51,7 @@ app.use(passport.session());
 // Define routes
 
 app.get('/', (req, res, next) => {
-   const appName = req.query.app || 'app1'; // Determine the enterprise app from query parameter
    const config = enterpriseAppConfig
-   console.log('Appname param value:', appName);
    passport.authenticate('azuread-openidconnect', { failureRedirect: '/', ...config })(req, res, next);
   });
   
