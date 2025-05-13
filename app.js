@@ -43,7 +43,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Define routes
-app.get('/auth', passport.authenticate('azuread-openidconnect', { failureRedirect: '/' }), (req, res) => {
+app.get('/', passport.authenticate('azuread-openidconnect', { failureRedirect: '/' }), (req, res) => {
   res.redirect('/');
 });
 
