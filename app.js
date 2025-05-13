@@ -26,33 +26,17 @@ passport.deserializeUser((user, done) => {
 
 // Configuration for different enterprise apps
 const enterpriseAppConfig = {
-  app1: {
-    identityMetadata: process.env.APP1_IDENTITY_METADATA,
-    clientID: process.env.APP1_CLIENT_ID,
-    responseType: process.env.APP1_RESPONSE_TYPE,
-    responseMode: process.env.APP1_RESPONSE_MODE,
-    redirectUrl: process.env.APP1_REDIRECT_URL,
-    clientSecret: process.env.APP1_CLIENT_SECRET,
-    scope: process.env.APP1_SCOPE.split(',')
-  },
-  app2: {
-    identityMetadata: process.env.APP2_IDENTITY_METADATA,
-    clientID: process.env.APP2_CLIENT_ID,
-    responseType: process.env.APP2_RESPONSE_TYPE,
-    responseMode: process.env.APP2_RESPONSE_MODE,
-    redirectUrl: process.env.APP2_REDIRECT_URL,
-    clientSecret: process.env.APP2_CLIENT_SECRET,
-    scope: process.env.APP2_SCOPE.split(',')
-  }
+    identityMetadata : process.env.IDENTITY_METADATA,
+    clientID: process.env.CLIENT_ID,
+    responseType: process.env.RESPONSE_TYPE,
+    responseMode: process.env.RESPONSE_MODE,
+    redirectUrl: process.env.REDIRECT_URL,
+    clientSecret: process.env.CLIENT_SECRET,
+    scope: process.env.SCOPE.split(',')
 };
 
-// Function to get the configuration based on the enterprise app
-function getEnterpriseAppConfig(appName) {
-  return enterpriseAppConfig[appName] || enterpriseAppConfig['app1'];
-}
-
 // Use the OIDCStrategy within Passport
-passport.use(new OIDCStrategy(getEnterpriseAppConfig('app1'), (issuer, sub, profile, accessToken, refreshToken, done) => {
+passport.use(new OIDCStrategy(enterpriseAppConfig, (issuer, sub, profile, accessToken, refreshToken, done) => {
   // Store tokens and authorization code in the session
   profile.authorizationCode = sub;
   profile.accessToken = accessToken;
@@ -68,12 +52,12 @@ app.use(passport.session());
 
 app.get('/', (req, res, next) => {
    const appName = req.query.app || 'app1'; // Determine the enterprise app from query parameter
-   const config = getEnterpriseAppConfig(appName);
+   const config = enterpriseAppConfig
    console.log('Appname param value:', appName);
    passport.authenticate('azuread-openidconnect', { failureRedirect: '/', ...config })(req, res, next);
   });
   
-  app.get('/auth/callback', passport.authenticate('azuread-openidconnect', { failureRedirect: '/' }), (req, res) => {
+app.get('/auth/callback', passport.authenticate('azuread-openidconnect', { failureRedirect: '/' }), (req, res) => {
    const appInfo = req.session.appInfo; // Retrieve app information from session
    res.send(`
    <html>
