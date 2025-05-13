@@ -6,7 +6,7 @@ const passport = require('passport');
 const OIDCStrategy = require('passport-azure-ad').OIDCStrategy;
 const session = require('express-session');
 
-const scope = process.env.SCOPE.split(',');
+const scope = process.env.APP1_SCOPE.split(',');
 const app = express();
 
 // Set up session middleware
@@ -27,12 +27,12 @@ passport.deserializeUser((user, done) => {
 
 // Use the OIDCStrategy within Passport
 passport.use(new OIDCStrategy({
-  identityMetadata: process.env.IDENTITY_METADATA,
-  clientID: process.env.CLIENT_ID,
-  responseType: process.env.RESPONSE_TYPE,
-  responseMode: process.env.RESPONSE_MODE,
-  redirectUrl: process.env.REDIRECT_URL,
-  clientSecret: process.env.CLIENT_SECRET,
+  identityMetadata: process.env.APP1_IDENTITY_METADATA,
+  clientID: process.env.APP1_CLIENT_ID,
+  responseType: process.env.APP1_RESPONSE_TYPE,
+  responseMode: process.env.APP1_RESPONSE_MODE,
+  redirectUrl: process.env.APP1_REDIRECT_URL,
+  clientSecret: process.env.APP1_CLIENT_SECRET,
   scope: scope,
 }, (issuer, sub, profile, accessToken, refreshToken, done) => {
   return done(null, profile);
