@@ -99,6 +99,6 @@ const options = {
   rejectUnauthorized: false // Add this line
 };
 
-https.createServer(options, app).listen(3000, () => {
-  console.log('Server started on https://localhost:3000');
+https.createServer(options, app).listen(3002, () => {
+  console.log('Server started on https://localhost:3002');
 });
