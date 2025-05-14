@@ -16,14 +16,14 @@
 	// "features": {},
 	// Ports attribute to forward ports from the container to the host.
 	"portsAttributes": {
-		"3000": {
+		"3002": {
 			"label": "App",
 			"onAutoForward": "notify"
 		}
 	},
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	"forwardPorts": [
-		3000
+		3002
 	],
 	// Use 'postCreateCommand' to run commands after the container is created.
 	"postCreateCommand": "npm install express passport passport-azure-ad dotenv express-session"
