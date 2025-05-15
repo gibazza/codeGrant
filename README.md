@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-Before you begin, ensure you have the following installed:
+Before you begin, ensure you have the following installed (if not using Dev Containers):
 
 - **Node.js**: Download and install from the [official Node.js website](https://nodejs.org/).
 - Alternatively, install Node.js using Windows Package Manager:
@@ -11,6 +11,23 @@ Before you begin, ensure you have the following installed:
     ```
 - **npm**: Node.js comes with npm (Node Package Manager).
 - **OpenSSL**: Required to generate self-signed certificates. [Download OpenSSL for Windows](https://slproweb.com/products/Win32OpenSSL.html) or install via package manager.
+
+---
+
+## Running in a Dev Container (Recommended)
+
+This project supports [VS Code Dev Containers](https://code.visualstudio.com/docs/devcontainers/containers).  
+You can develop and run the app in a fully configured containerized environment.
+
+1. **Open the project in VS Code.**
+2. **Install the "Dev Containers" extension** if you haven't already.
+3. **Reopen the project in the Dev Container:**  
+   Press `F1` and select `Dev Containers: Reopen in Container`.
+4. The container will automatically install all dependencies.
+
+> **Note:** The `certs/` directory is excluded from source control. You must generate self-signed certificates inside the container (see below).
+
+---
 
 ## Environment Variables
 
@@ -34,13 +51,14 @@ API_SCOPE=https://graph.microsoft.com/.default
 - Replace the placeholder values with your actual configuration.
 - Ensure your certificate files are correctly placed and the paths are specified in the `.env` file.
 
+---
+
 ## Creating Self-Signed Certificates
 
-To run the application over HTTPS locally, you need self-signed certificates.  
-Follow these steps to generate them using OpenSSL:
+To run the application over HTTPS locally or in a dev container, you need self-signed certificates.
 
 1. Open a terminal and navigate to your project directory.
-2. Run the following command to create a new private key and certificate:
+2. Run the following commands to create a new private key and certificate:
 
     ```bash
     mkdir certs
@@ -53,7 +71,9 @@ Follow these steps to generate them using OpenSSL:
 3. **Do not commit your private key or certificate to source control.**  
    The `.gitignore` is already set up to exclude the `certs/` directory.
 
-## Installation
+---
+
+## Installation (Local Machine)
 
 1. Clone the repository:
     ```bash
@@ -70,6 +90,8 @@ Follow these steps to generate them using OpenSSL:
     npm install
     ```
 
+---
+
 ## Running the Application
 
 1. Start the server:
@@ -82,11 +104,15 @@ Follow these steps to generate them using OpenSSL:
     https://localhost:3002
     ```
 
+---
+
 ## Usage
 
 - **Authentication**: Go to `/` to start the authentication process.
 - **Callback**: After successful authentication, you will be redirected to `/auth/callback` where user information will be displayed.
 - **Fetch Users**: On the callback page, click "Fetch Users" to retrieve users from Microsoft Graph using the client credentials flow.
+
+---
 
 ## Features
 
@@ -96,9 +122,13 @@ Follow these steps to generate them using OpenSSL:
 - Session management with express-session.
 - Logout functionality with redirect to Microsoft logout endpoint.
 
+---
+
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+---
 
 ## Acknowledgements
 
