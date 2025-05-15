@@ -7,6 +7,7 @@ const passport = require('passport');
 const OIDCStrategy = require('passport-azure-ad').OIDCStrategy;
 const session = require('express-session');
 const axios = require('axios');
+const qs = require('qs');
 
 const app = express();
 
@@ -65,36 +66,37 @@ app.get('/', (req, res, next) => {
 
 app.get('/auth/callback', passport.authenticate('azuread-openidconnect', { failureRedirect: '/' }), (req, res) => {
     res.send(`
-    <html>
-    <body>
-    <h1>Authentication Successful</h1>
-    <p>Welcome, ${req.user.displayName}!</p>
-    <p>Email: ${req.user._json.email}</p>
-    <p>Profile:</p>
-    <pre>${JSON.stringify(req.user, null, 2)}</pre>
-    <h2>OAuth 2.0 Authorization Code Flow and Token Exchange</h2>
-    <p><strong>Step 1:</strong> User is redirected to the authorization server's authorization endpoint.</p>
-    <p><strong>Step 2:</strong> User authenticates and authorizes the client application.</p>
-    <p><strong>Step 3:</strong> Authorization server redirects the user back to the client application with an authorization code.</p>
-    <p><strong>Authorization Code:</strong> ${req.user.authorizationCode}</p>
-    <p><strong>Step 4:</strong> Client application exchanges the authorization code for an access token and refresh token.</p>
-    <p><strong>Access Token:</strong> ${req.user.accessToken}</p>
-    <p><strong>Refresh Token:</strong> ${req.user.refreshToken}</p>
-    <button onclick="fetchUsers()">Fetch Users</button>
-    <div id="users"></div>
-    <script>
+        <html>
+        <body>
+        <h1>Authentication Successful</h1>
+        <p>Welcome, ${req.user.displayName}!</p>
+        <p>Email: ${req.user._json.email}</p>
+        <p>Profile:</p>
+        <pre>${JSON.stringify(req.user, null, 2)}</pre>
+        <h2>OAuth 2.0 Authorization Code Flow and Token Exchange</h2>
+        <p><strong>Step 1:</strong> User is redirected to the authorization server's authorization endpoint.</p>
+        <p><strong>Step 2:</strong> User authenticates and authorizes the client application.</p>
+        <p><strong>Step 3:</strong> Authorization server redirects the user back to the client application with an authorization code.</p>
+        <p><strong>Authorization Code:</strong> ${req.user.authorizationCode}</p>
+        <p><strong>Step 4:</strong> Client application exchanges the authorization code for an access token and refresh token.</p>
+        <p><strong>User Access Token:</strong> ${req.user.accessToken}</p>
+        <p><strong>Refresh Token:</strong> ${req.user.refreshToken}</p>
+        <button onclick="fetchUsers()">Fetch Users</button>
+        <div id="users"></div>
+        <script>
         async function fetchUsers() {
             const response = await fetch('/get-users');
-            const users = await response.json();
+            const data = await response.json();
             const usersDiv = document.getElementById('users');
-            usersDiv.innerHTML = '<h1>Users in Entra Tenant</h1><ul>' + users.map(user => '<li>' + user.displayName + ' (' + user.mail + ')</li>').join('') + '</ul>';
+            usersDiv.innerHTML = '<strong>API Access Token:</strong>' + data.accessToken;
+            usersDiv.innerHTML += '<h1>Users in Entra Tenant</h1><ul>' + data.users.map(user => '<li>' + user.displayName + ' (' + user.mail + ')</li>').join('') + '</ul>';
         }
-    </script>
-    <form action="/logout" method="post">
-    <button type="submit">Logout</button>
-    </form>
-    </body>
-    </html>
+        </script>
+        <form action="/logout" method="post">
+        <button type="submit">Logout</button>
+        </form>
+        </body>
+        </html>
     `);
 });
 
