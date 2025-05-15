@@ -33,7 +33,7 @@ Before you begin, ensure you have met the following requirements:
 
 3. Install the dependencies:
     ```bash
-    npm install express passport passport-azure-ad dotenv express-session
+    npm install express passport passport-azure-ad dotenv express-session axios https 
     ```
 
 ## Configuration
@@ -56,17 +56,17 @@ Before you begin, ensure you have met the following requirements:
 ## Running the Script
 1. Start the server:
     ```bash
-    node app 1.js
+    node app.js
     ```
 
 2. Open your browser and navigate to:
     ```
-    https://localhost:3000
+    https://localhost:3002
     ```
 
 ## Usage
 
-- **Authentication**: Navigate to `/auth` to start the authentication process.
+- **Authentication**: Navigate to `/` to start the authentication process.
 - **Callback**: After successful authentication, you will be redirected to `/auth/callback` where user information will be displayed.
 
 ## License
