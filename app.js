@@ -7,6 +7,7 @@ const passport = require('passport');
 const OIDCStrategy = require('passport-azure-ad').OIDCStrategy;
 const session = require('express-session');
 const axios = require('axios');
+const qs = require('querystring');
 
 const app = express();
 
@@ -35,6 +36,13 @@ const enterpriseAppConfig = {
     redirectUrl: process.env.REDIRECT_URL,
     clientSecret: process.env.CLIENT_SECRET,
     scope: process.env.SCOPE.split(',')
+};
+
+// Configuration for different enterprise apps
+const ApiConfig = {
+    clientID: process.env.API_CLIENT_ID,
+    clientSecret: process.env.API_CLIENT_SECRET,
+    scope: process.env.API_SCOPE.split(',')
 };
 
 // Use the OIDCStrategy within Passport
@@ -102,20 +110,42 @@ app.post('/logout', (req, res) => {
     });
 });
 
-// Route to fetch users using the access token from the session
 app.get('/get-users', async (req, res) => {
-    try {
-        const accessToken = req.user.accessToken;
-        const response = await axios.get('https://graph.microsoft.com/v1.0/users', {
-            headers: {
-                Authorization: `Bearer ${accessToken}`
-            }
-        });
-        res.json(response.data.value);
-    } catch (error) {
-        console.error('Error getting users:', error);
-        res.status(500).send('Error getting users');
-    }
+  try {
+    // Step 1: Fetch the OpenID Connect metadata
+    const metadataResponse = await axios.get(process.env.IDENTITY_METADATA);
+    const tokenEndpoint = metadataResponse.data.token_endpoint;
+
+    // Step 2: Acquire token using client credentials flow
+    const tokenResponse = await axios.post(
+      tokenEndpoint,
+      qs.stringify({
+        client_id: ApiConfig.clientID,
+        client_secret: ApiConfig.clientSecret,
+        scope: ApiConfig.scope.join(' '),
+        grant_type: 'client_credentials'
+      }),
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }
+    );
+
+    const accessToken = tokenResponse.data.access_token;
+
+    // Step 3: Use the token to call Microsoft Graph
+    const response = await axios.get('https://graph.microsoft.com/v1.0/users', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      }
+    });
+
+    res.json(response.data.value);
+  } catch (error) {
+    console.error('Error getting users:', error.response?.data || error.message);
+    res.status(500).send('Error getting users');
+  }
 });
 
 const options = {
