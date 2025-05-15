@@ -1,23 +1,37 @@
-#OIDC Authenication Application
+# OAuth2 Authentication Application
 
 ## Prerequisites
 
-Before you begin, ensure you have met the following requirements:
-- **Node.js**: Install Node.js from [Node.js official website](https://nodejs.js package manager, which is included with Node.js.
-- Alternative **Node.js**: Install Node.js via
-    ```bash 
+Before you begin, ensure you have the following installed:
+
+- **Node.js**: Download and install from the [official Node.js website](https://nodejs.org/).
+- Alternatively, install Node.js using Windows Package Manager:
+    ```bash
     winget install OpenJS.NodeJS
     ```
-- **Environment Variables**: Create a `.env` file in the root directory with the following variables:
-  - `IDENTITY_METADATA`
-  - `CLIENT_ID`
-  - `RESPONSE_TYPE`
-  - `RESPONSE_MODE`
-  - `REDIRECT_URL`
-  - `CLIENT_SECRET`
-  - `SCOPE`
-  - `CERT_KEY_FILE`
-  - `CERT_FILE`
+- **npm**: Node.js comes with npm (Node Package Manager).
+
+## Environment Variables
+
+Create a `.env` file in the root directory with the following variables:
+
+```plaintext
+IDENTITY_METADATA=<your-identity-metadata-url>
+CLIENT_ID=<your-client-id>
+REDIRECT_URL=<your-redirect-url>
+RESPONSE_TYPE=code
+RESPONSE_MODE=query
+CLIENT_SECRET=<your-client-secret>
+SCOPE=openid,profile,email,offline_access
+CERT_KEY_FILE=./certs/server.key
+CERT_FILE=./certs/server.cert
+API_CLIENT_ID=<your-api-client-id>
+API_CLIENT_SECRET=<your-api-client-secret>
+API_SCOPE=https://graph.microsoft.com/.default
+```
+
+- Replace the placeholder values with your actual configuration.
+- Ensure your certificate files are correctly placed and the paths are specified in the `.env` file.
 
 ## Installation
 
@@ -31,29 +45,13 @@ Before you begin, ensure you have met the following requirements:
     cd <project-directory>
     ```
 
-3. Install the dependencies:
+3. Install dependencies:
     ```bash
-    npm install express passport passport-azure-ad dotenv express-session axios https 
+    npm install
     ```
 
-## Configuration
+## Running the Application
 
-1. Create a `.env` file in the root directory and add the required environment variables:
-    ```plaintext
-    IDENTITY_METADATA=<your-identity-metadata-url>
-    CLIENT_ID=<your-client-id>
-    RESPONSE_TYPE=<your-response-type>
-    RESPONSE_MODE=<your-response-mode>
-    REDIRECT_URL=<your-redirect-url>
-    CLIENT_SECRET=<your-client-secret>
-    SCOPE=<your-scope>
-    CERT_KEY_FILE=<path-to-your-cert-key-file>
-    CERT_FILE=<path-to-your-cert-file>
-    ```
-
-2. Ensure your certificate files are correctly placed and paths are specified in the `.env` file.
-
-## Running the Script
 1. Start the server:
     ```bash
     node app.js
@@ -66,15 +64,15 @@ Before you begin, ensure you have met the following requirements:
 
 ## Usage
 
-- **Authentication**: Navigate to `/` to start the authentication process.
+- **Authentication**: Go to `/` to start the authentication process.
 - **Callback**: After successful authentication, you will be redirected to `/auth/callback` where user information will be displayed.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSEfile for details.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ## Acknowledgements
 
-- Express
-- [Passport](httpnv
-- [passport-azure-ad](https://www.npmjs.com/package/passport
+- [Express](https://expressjs.com/)
+- [Passport](http://www.passportjs.org/)
+- [passport-azure-ad](https://www.npmjs.com/package/passport-azure-ad)
