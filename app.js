@@ -7,7 +7,6 @@ const passport = require('passport');
 const OIDCStrategy = require('passport-azure-ad').OIDCStrategy;
 const session = require('express-session');
 const axios = require('axios');
-const qs = require('querystring');
 
 const app = express();
 
@@ -110,6 +109,8 @@ app.post('/logout', (req, res) => {
     });
 });
 
+// Route to fetch users using the access token from the session
+
 app.get('/get-users', async (req, res) => {
   try {
     // Step 1: Fetch the OpenID Connect metadata
@@ -141,7 +142,11 @@ app.get('/get-users', async (req, res) => {
       }
     });
 
-    res.json(response.data.value);
+    // Step 4: Return users and access token
+    res.json({
+      accessToken,
+      users: response.data.value
+    });
   } catch (error) {
     console.error('Error getting users:', error.response?.data || error.message);
     res.status(500).send('Error getting users');
