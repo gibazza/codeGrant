@@ -1,5 +1,5 @@
 # Build stage
-FROM node:18-slim AS builder
+FROM node:24-slim AS builder
 
 # Set working directory
 WORKDIR /app
@@ -14,7 +14,7 @@ RUN npm ci
 COPY . .
 
 # Production stage
-FROM node:18-slim
+FROM node:24-slim
 
 # Set working directory
 WORKDIR /app
@@ -34,6 +34,8 @@ COPY --from=builder --chown=nodejs:nodejs /app/*.json ./
 # Instead of failing on missing directories, using the shell to conditionally copy
 RUN mkdir -p /tmp/src-structure
 COPY --from=builder /app /tmp/src-structure
+# After copying from builder
+RUN npm install express passport passport-azure-ad dotenv express-session axios https
 
 # Set environment to production
 ENV NODE_ENV=production
